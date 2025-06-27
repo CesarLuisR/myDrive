@@ -1,0 +1,21 @@
+@api = http://localhost:5000/api/auth 
+
+### Sign up
+POST {{api}}/signup
+Content-Type: application/json
+
+{
+    "name": "Cesar Luis",
+    "lastname": "Rijo Cedano",
+    "email": "cesarluisrc@gmail.com",
+    "password": "cesarluis2005"
+}
+
+### Login
+POST {{api}}/login
+Content-Type: application/json
+
+{
+    "identifier": "cesarluisrc@gmail.com",
+    "password": "cesarluis2005"
+}

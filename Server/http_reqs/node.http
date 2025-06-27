@@ -1,0 +1,17 @@
+@api = http://localhost:5000/api/nodes
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY3NDBjYjJlLWQyNTAtNGNiOC1iNjgxLTQxYzIzZmYzZmNmZiIsImlhdCI6MTc1MDc2Nzc5NywiZXhwIjoxNzUwNzY5NTk3fQ.SQnmaylEgSOCEiRiZGVlrk1-7m5fAGK4uwbuc9uWGP8 
+
+### CREATE FOLDER
+POST {{api}}/
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "secondFolder",
+    "description": "Una descripcion cualquiera",
+    "parent_id": "559074e0-e317-4aa5-b03d-788967835cb3",
+    "type": "folder"
+}
+
+### CREATE FILE
+### I HAVE NO IDEA HOW TO IT HERE -> POSTMAN

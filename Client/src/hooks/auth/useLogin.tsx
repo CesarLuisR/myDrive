@@ -1,22 +1,24 @@
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import type { RootState } from "../../context/store";
-import { loginUser, type LogInData } from "../../services/authService";
+import { type AppDispatch, type RootState } from "../../context/store";
+import { loginUserService, type LogInData } from "../../services/authService";
 import { setAuthError, setAuthLoading, setCredentials } from "../../context/auth/authSlice";
 
 export default function useLogin() {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const { loading, error } = useSelector((state: RootState) => state.auth);
 
-    const login = async (credentials: LogInData) => {
+    const login = async (credentials: LogInData): Promise<boolean> => {
         try {
             dispatch(setAuthLoading(true));
-            const data = await loginUser(credentials);
+            const data = await loginUserService(credentials);
 
             dispatch(setCredentials(data.user));
+            return true
         } catch(e) {
             console.error(e);
             dispatch(setAuthError("There was an error"));
+            return false;
         } finally {
             dispatch(setAuthLoading(false));
         }

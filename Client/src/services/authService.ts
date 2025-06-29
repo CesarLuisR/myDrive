@@ -14,7 +14,7 @@ export interface LogInData {
     password: string;
 }
 
-export const registerUser = async (data: SignUpData): Promise<boolean> => {
+export const registerUserService = async (data: SignUpData): Promise<boolean> => {
     try {
         await axios.post(apiRoutes.auth.signUp, data);
         return true;
@@ -29,11 +29,25 @@ interface LoginResponse {
     error: boolean
 }
 
-export const loginUser = async (data: LogInData): Promise<LoginResponse> => {
+export const loginUserService = async (data: LogInData): Promise<LoginResponse> => {
     try {
         const res = await axios.post(
             apiRoutes.auth.logIn,
             data, 
+            { withCredentials: true }
+        );
+        return { user: res.data.user, error: false };
+    } catch(e) {
+        console.error(e);
+        throw e;
+    }
+}
+
+export const loadUserService = async (): Promise<{user: User, error: boolean}> => {
+    try {
+        const res = await axios.post(
+            apiRoutes.auth.loadUser,
+            {},
             { withCredentials: true }
         );
         return { user: res.data.user, error: false };

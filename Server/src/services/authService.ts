@@ -62,3 +62,18 @@ type FoundUserType = {
     hash_password: string,
     uuid: string
 }
+
+export const loadUser = async (id: string) => {
+    try {
+        const data = await pool.query(userQueries.getUserById, [id]);
+
+        if (data.rowCount === 0) {
+            throw new Error("No user found");
+        }
+
+        return data.rows[0];
+    } catch(e) {
+        console.error("Error during loading user service:", e);
+        throw e;
+    }
+}

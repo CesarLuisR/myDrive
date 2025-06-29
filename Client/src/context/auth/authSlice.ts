@@ -11,7 +11,7 @@ const authSlice = createSlice({
         setAuthLoading: authEvents.setAuthLoadingEvent,
         setAuthError: authEvents.setAuthErrorEvent
     },
-    // No thunks, i dont like them
+    // No thunks, i dont like them. Hooks is my way
 });
 
 export const { setCredentials, clearCredentials, setAuthLoading, setAuthError } = authSlice.actions;

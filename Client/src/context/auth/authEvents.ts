@@ -8,6 +8,7 @@ export const setCredentialsEvent = (
 ) => {
     state.user = action.payload
     state.authenticated = true
+    state.error = null
 };
 
 export const clearCredentialsEvent = (state: AuthState) => {
@@ -23,8 +24,8 @@ export const setAuthLoadingEvent = (
 
 export const setAuthErrorEvent = (
     state: AuthState,
-    action: PayloadAction<string>
+    action: PayloadAction<string | null>
 ) => {
     state.error = action.payload
-    state.loading = true
+    state.loading = false
 };

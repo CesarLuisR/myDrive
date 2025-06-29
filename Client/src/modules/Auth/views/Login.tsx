@@ -15,10 +15,11 @@ export default function Login() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        await login(formData);
-        if (!error) {
+        
+        const success = await login(formData);
+
+        if (success)
             navigate("/");
-        }
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

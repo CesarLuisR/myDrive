@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { LogInData, SignUpData } from "../types/auth";
-import { loginUser, registerUser } from "../services/authService";
+import { loadUser, loginUser, registerUser } from "../services/authService";
 import config from "../config"
 
 export const signUp: RequestHandler = async (req, res) => {
@@ -52,6 +52,23 @@ export const logIn: RequestHandler = async (req, res) => {
             .json({ message: "User logged successfully", user });
     } catch(e: any) {
         console.error("Error in login controller:", e);
+
+        res.status(500).json({ message: e.message });
+    }
+}
+
+export const load: RequestHandler = async (req, res) => {
+    try {
+        if (!req.user?.id) {
+            res.status(500).json({message: "Error"});
+            return;
+        }
+
+        const user = await loadUser(req.user?.id);
+
+        res.status(200).json({ user })
+    } catch(e: any) {
+        console.error("Error in load user controller:", e);
 
         res.status(500).json({ message: e.message });
     }

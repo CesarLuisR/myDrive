@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import type { RootState } from "../../context/store";
 import { setAuthError, setAuthLoading } from "../../context/auth/authSlice";
-import { registerUser, type SignUpData } from "../../services/authService";
+import { registerUserService , type SignUpData } from "../../services/authService";
 
 export default function useSignUp() {
     const dispatch = useDispatch();
@@ -11,7 +11,7 @@ export default function useSignUp() {
     const signUp = async (credentials: SignUpData) => {
         try {
             dispatch(setAuthLoading(true));
-            await registerUser(credentials);
+            await registerUserService(credentials);
         } catch(e) {
             console.error(e);
             dispatch(setAuthError("There was an error"));

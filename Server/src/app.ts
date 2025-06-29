@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));
 
 // routes
-app.use("/api/auth", authRoutes);
-app.use("/api/nodes", authenticateToken, nodeRoutes);
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/nodes", authenticateToken, nodeRoutes);
 
 export default app;

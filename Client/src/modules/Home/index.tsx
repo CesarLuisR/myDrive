@@ -1,21 +1,25 @@
-import { useSelector } from "react-redux";
-import type { RootState } from "../../context/store";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from 'react'; 
+import { Navigate } from "react-router-dom";
+import useAuth from "../../hooks/auth/useAuth";
 
 export default function Home() {
-    const { authenticated } = useSelector((state: RootState) => state.auth);
-    const navigate = useNavigate();
+    const { authenticated, user, initialized, loading, error } = useAuth();
 
-    useEffect(() => {
-        if (!authenticated) {
-            navigate("/login");
-        }
-    }, [authenticated, navigate]);
-
-    if (!authenticated) {
-        return <div>Redirigiendo...</div>;
+    if (!initialized || loading) {
+        return "Cargando...";
     }
 
-    return <div>Hola, estás en Home</div>;
+    if (!authenticated) {
+        console.log("KLK");
+        return <Navigate to="/login" replace />;
+    }
+
+    if (error) {
+        return "Error";
+    }
+
+    console.log("Se renderizo el HOME");
+    return <div>
+        Hola, estás en Home
+        <div>{user?.name}</div>
+    </div>;
 }

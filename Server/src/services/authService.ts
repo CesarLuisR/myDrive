@@ -1,5 +1,5 @@
 import { pool } from "../database/db";
-import { LogInData, SignUpData } from "../types/auth";
+import { LogInData, SignUpData, User } from "../types/auth";
 import { comparePassword, hashPassword } from "../utils/hash";
 import * as userQueries from "../models/authModel";
 import validator from "validator";
@@ -19,19 +19,19 @@ export const registerUser = async (data: SignUpData) => {
     }
 }
 
-export const loginUser = async (loginData: LogInData): Promise<string> => {
+export const loginUser = async (loginData: LogInData): Promise<{token: string, user: User}> => {
     try {
         const isEmail = validator.isEmail(loginData.identifier);
 
-        const rawUserData = isEmail 
+        const rawBriefUserData = isEmail 
             ? await pool.query(userQueries.getUserByEmail, [loginData.identifier])
             : await pool.query(userQueries.getUserByUsername, [loginData.identifier])
         
-        if (rawUserData.rowCount == 0) {
+        if (rawBriefUserData.rowCount == 0) {
             throw new Error( "Invalid credentials");
         }
 
-        const foundUser: FoundUserType = rawUserData.rows[0];
+        const foundUser: FoundUserType = rawBriefUserData.rows[0];
 
         const isPasswordValid: boolean = await comparePassword(loginData.password, foundUser.hash_password);
         if (!isPasswordValid) {
@@ -43,7 +43,15 @@ export const loginUser = async (loginData: LogInData): Promise<string> => {
         }
 
         const token = generateToken(tokenPayload);
-        return token;
+
+        const rawCompleteUserData = await pool.query(userQueries.getUserById, [foundUser.uuid]);
+        if (rawCompleteUserData.rowCount === 0) {
+            throw new Error("Server error");
+        }
+
+        const user: User = rawCompleteUserData.rows[0];
+
+        return { token, user };
     } catch(e) {
         console.error("Error during login:", e);
         throw e;

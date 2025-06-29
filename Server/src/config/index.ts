@@ -1,6 +1,8 @@
 interface AppConfig {
     port: number;
     jwtSecret: string;
+    origin: string;
+    ENV: string;
     db: {
         user: string;
         host: string;
@@ -19,6 +21,8 @@ interface AppConfig {
 const config: AppConfig = {
     port: parseInt(process.env.PORT || '5000'),
     jwtSecret: process.env.JWT_SECRET || 'fallback_secret',
+    origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+    ENV: process.env.NODE_ENV || 'production',
     db: {
         user: process.env.DB_USER || 'postgres',
         host: process.env.DB_HOST || 'localhost',

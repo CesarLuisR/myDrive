@@ -2,8 +2,12 @@ import { RequestHandler } from "express";
 import { verifyToken } from "../utils/token";
 
 export const authenticateToken: RequestHandler = (req, res, next) => {
+    const tokenFromCookie = req.cookies?.token;
+
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const tokenFromHeader = authHeader && authHeader.split(' ')[1];
+
+    const token = tokenFromCookie || tokenFromHeader;
 
     if (token == null) {
         res.status(401).json({ message: "Denied access. No token provided"});

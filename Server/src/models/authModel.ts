@@ -18,3 +18,10 @@ export const getUserByUsername = `
     FROM users
     WHERE CONCAT(name || ' ' || last_name) = $1
 `;
+
+export const getUserById = `
+    SELECT 
+        uuid, name, last_name, email
+    FROM users
+    WHERE uuid = $1
+`

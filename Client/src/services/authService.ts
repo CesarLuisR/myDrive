@@ -1,5 +1,6 @@
 import axios from "axios"
 import { apiRoutes } from "../config/apiRoutes"
+import type { User } from "../types/User";
 
 export interface SignUpData {
     name: string,
@@ -19,6 +20,25 @@ export const registerUser = async (data: SignUpData): Promise<boolean> => {
         return true;
     } catch(e) {
         console.error(e);
-        return false;
+        throw e;
+    }
+}
+
+interface LoginResponse {
+    user: User
+    error: boolean
+}
+
+export const loginUser = async (data: LogInData): Promise<LoginResponse> => {
+    try {
+        const res = await axios.post(
+            apiRoutes.auth.logIn,
+            data, 
+            { withCredentials: true }
+        );
+        return { user: res.data.user, error: false };
+    } catch(e) {
+        console.error(e);
+        throw e;
     }
 }

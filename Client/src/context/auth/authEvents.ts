@@ -2,29 +2,26 @@ import type { PayloadAction } from "@reduxjs/toolkit"
 import { initialState, type AuthState } from "./authType";
 import type { User } from "../../types/User";
 
-export const setCredentials = (
+export const setCredentialsEvent = (
     state: AuthState, 
-    action: PayloadAction<{user: User, token: string}>
+    action: PayloadAction<User>
 ) => {
-    state.user = action.payload.user
-    state.token = action.payload.token
+    state.user = action.payload
     state.authenticated = true
-    state.loading = false
-    state.error = null
 };
 
-export const clearCredentials = (state: AuthState) => {
+export const clearCredentialsEvent = (state: AuthState) => {
     Object.assign(state, initialState);
 };
 
-export const setAuthLoading = (
+export const setAuthLoadingEvent = (
     state: AuthState, 
     action: PayloadAction<boolean>
 ) => {
     state.loading = action.payload;
 };
 
-export const setAuthError = (
+export const setAuthErrorEvent = (
     state: AuthState,
     action: PayloadAction<string>
 ) => {

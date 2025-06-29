@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { LogInData, SignUpData } from "../types/auth";
 import { loginUser, registerUser } from "../services/authService";
+import config from "../config"
 
 export const signUp: RequestHandler = async (req, res) => {
     try {
@@ -38,9 +39,17 @@ export const logIn: RequestHandler = async (req, res) => {
         if (typeof data.identifier != "string" || data.identifier.length > 30)
             throw new Error("Identifier format error");
 
-        const token = await loginUser(data);
+        const { token, user } = await loginUser(data);
 
-        res.status(201).json({ message: "User logged successfully", token });
+        res
+            .cookie("token", token, {
+                httpOnly: true,
+                secure: config.ENV === "production", 
+                sameSite: "lax",
+                maxAge: 30 * 60 * 1000, // 30 minutos
+            })
+            .status(201)
+            .json({ message: "User logged successfully", user });
     } catch(e: any) {
         console.error("Error in login controller:", e);
 

@@ -4,7 +4,7 @@ const API = config.api;
 
 export const apiRoutes = {
     auth: {
-        signUp: `${API}/auth/register`,
+        signUp: `${API}/auth/signup`,
         logIn: `${API}/auth/login`
     }
 };

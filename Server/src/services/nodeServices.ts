@@ -1,16 +1,17 @@
 import { pool } from "../database/db";
 import { NodeData } from "../types/node";
 import * as nodeQueries from "../models/nodeModel";
+import { BadRequestError, Conflict } from "../utils/error";
 
 export const createNodeService = async (data: NodeData) => {
     try {
         if (data.parent_id != null) {
             const parentNodes = await pool.query(nodeQueries.getNodeById, [data.parent_id]);
             if (parentNodes.rowCount == 0 )
-                throw new Error("Invalid parent id");
+                throw new BadRequestError("Invalid parent id");
 
             const type = parentNodes.rows[0].type;
-            if (type != 'folder') throw new Error("Invalid parent id");
+            if (type != 'folder') throw new BadRequestError("Invalid parent id");
         }
 
         const duplicatedNodes = await pool.query(
@@ -19,9 +20,8 @@ export const createNodeService = async (data: NodeData) => {
         );
 
         console.log("Cantidad: ", duplicatedNodes.rowCount);
-        if (duplicatedNodes.rowCount != 0) {
-            throw new Error("There is a node with this name already");
-        }
+        if (duplicatedNodes.rowCount != 0) 
+            throw new Conflict("There is a node with this name already");
         
         await pool.query(
             nodeQueries.createNode, 

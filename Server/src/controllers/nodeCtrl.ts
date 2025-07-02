@@ -3,24 +3,19 @@ import { CreateNodeData, NodeData } from "../types/node";
 import { createNodeService } from "../services/nodeServices";
 import { storageFileService } from "../services/storageFileService";
 import { createUniqueFileName } from "../utils/createUniqueName";
+import { BadRequestError, NotFoundError } from "../utils/error";
 
-export const createNode: RequestHandler = async (req, res) => {
+export const createNode: RequestHandler = async (req, res, next) => {
     try {
         const data = req.body as CreateNodeData;
-        if (!data.name || !data.type) {
-            res.status(400).json({ message: "Name and type are required." });
-            return;
-        }
+        if (!data.name || !data.type)
+            throw new NotFoundError("Name and type are required");
 
-        if (data.type !== 'file' && data.type !== 'folder') {
-            res.status(400).json({ message: "Invalid node type. Must be 'file' or 'folder'." });
-            return;
-        }
+        if (data.type !== 'file' && data.type !== 'folder')
+            throw new BadRequestError("Invalid node type. Must be file or folder");
 
-        if (!req.user?.id) {
-            res.status(500).json({ message: "Internal server error" });
-            return;
-        }
+        if (!req.user?.id)
+            throw new NotFoundError("Not user found");
 
         let NodeData: NodeData = {
             user_id: req.user?.id,
@@ -34,16 +29,14 @@ export const createNode: RequestHandler = async (req, res) => {
         }
 
         if (data.type == 'folder') {
-            // Por aqui podria ir yendo o no se
             await createNodeService(NodeData);
             res.status(200).json({ message: "Folder created successfully" });
             return;
         }
 
-        if (!req.file) {
-            res.status(400).json({ message: "No file provided " });
-            return;
-        }
+        if (!req.file)
+            throw new BadRequestError("No file provided");
+
         const fileKey = createUniqueFileName(req.user?.id, req.file.originalname);
 
         NodeData = {
@@ -62,7 +55,6 @@ export const createNode: RequestHandler = async (req, res) => {
         
         res.status(200).json({ message: "File created successfully" });
     } catch(e: any) {
-        console.log(e);
-        res.status(500).json({ message: e.message });
+        next(e);
     }
 }

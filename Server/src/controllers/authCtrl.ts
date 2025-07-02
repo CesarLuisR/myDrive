@@ -2,42 +2,36 @@ import { RequestHandler } from "express";
 import { LogInData, SignUpData } from "../types/auth";
 import { loadUser, loginUser, registerUser } from "../services/authService";
 import config from "../config"
+import { BadRequestError, NotFoundError, UnauthorizedError } from "../utils/error";
 
-export const signUp: RequestHandler = async (req, res) => {
+export const signUp: RequestHandler = async (req, res, next) => {
     try {
         const data: SignUpData = req.body;
-        if (!data.email || !data.lastname || !data.name || !data.password) {
-            res.status(400).json({ message: "All data is required" });
-            return;
-        }
+        if (!data.email || !data.lastname || !data.name || !data.password)
+            throw new BadRequestError("All data is required");
 
-        if (typeof data.password != "string" || data.password.length > 30)  {
-            throw new Error("Password format error");
-        }
+        if (typeof data.password != "string" || data.password.length > 30)
+            throw new BadRequestError("Password format error");
 
         await registerUser(data);
 
         res.status(201).json({ message: "User created successfully" });
     } catch(e: any) {
-        console.error("Error in signUp controller:", e);
-
-        res.status(500).json({ message: e.message });
+        next(e);
     }
 }
 
-export const logIn: RequestHandler = async (req, res) => {
+export const logIn: RequestHandler = async (req, res, next) => {
     try {
         const data: LogInData = req.body;
-        if (!data.identifier || !data.password) {
-            res.status(400).json({ message: "All data is required" });
-            return;
-        }
+        if (!data.identifier || !data.password) 
+            throw new BadRequestError("All data is required");
 
         if (typeof data.password != "string" || data.password.length > 30)
-            throw new Error("Password format error");
+            throw new BadRequestError("Password format error");
 
         if (typeof data.identifier != "string" || data.identifier.length > 30)
-            throw new Error("Identifier format error");
+            throw new BadRequestError("Identifier format error");
 
         const { token, user } = await loginUser(data);
 
@@ -51,25 +45,19 @@ export const logIn: RequestHandler = async (req, res) => {
             .status(201)
             .json({ message: "User logged successfully", user });
     } catch(e: any) {
-        console.error("Error in login controller:", e);
-
-        res.status(500).json({ message: e.message });
+        next(e);
     }
 }
 
-export const load: RequestHandler = async (req, res) => {
+export const load: RequestHandler = async (req, res, next) => {
     try {
-        if (!req.user?.id) {
-            res.status(500).json({message: "Error"});
-            return;
-        }
+        if (!req.user?.id) 
+            throw new NotFoundError("User not found");
 
         const user = await loadUser(req.user?.id);
 
         res.status(200).json({ user })
     } catch(e: any) {
-        console.error("Error in load user controller:", e);
-
-        res.status(500).json({ message: e.message });
+        next(e);
     }
 }

@@ -4,6 +4,7 @@ import { comparePassword, hashPassword } from "../utils/hash";
 import * as userQueries from "../models/authModel";
 import validator from "validator";
 import { generateToken, TokenPayload } from "../utils/token";
+import { NotFoundError, UnauthorizedError } from "../utils/error";
 
 export const registerUser = async (data: SignUpData) => {
     try {
@@ -27,16 +28,14 @@ export const loginUser = async (loginData: LogInData): Promise<{token: string, u
             ? await pool.query(userQueries.getUserByEmail, [loginData.identifier])
             : await pool.query(userQueries.getUserByUsername, [loginData.identifier])
         
-        if (rawBriefUserData.rowCount == 0) {
-            throw new Error( "Invalid credentials");
-        }
+        if (rawBriefUserData.rowCount == 0)
+            throw new UnauthorizedError( "Invalid credentials");
 
         const foundUser: FoundUserType = rawBriefUserData.rows[0];
 
         const isPasswordValid: boolean = await comparePassword(loginData.password, foundUser.hash_password);
-        if (!isPasswordValid) {
-            throw new Error( "Invalid credentials");
-        }
+        if (!isPasswordValid)
+            throw new UnauthorizedError( "Invalid credentials");
 
         const tokenPayload: TokenPayload = {
             id: foundUser.uuid
@@ -45,9 +44,8 @@ export const loginUser = async (loginData: LogInData): Promise<{token: string, u
         const token = generateToken(tokenPayload);
 
         const rawCompleteUserData = await pool.query(userQueries.getUserById, [foundUser.uuid]);
-        if (rawCompleteUserData.rowCount === 0) {
-            throw new Error("Server error");
-        }
+        if (rawCompleteUserData.rowCount === 0) 
+            throw new NotFoundError("User not found");
 
         const user: User = rawCompleteUserData.rows[0];
 
@@ -67,9 +65,8 @@ export const loadUser = async (id: string) => {
     try {
         const data = await pool.query(userQueries.getUserById, [id]);
 
-        if (data.rowCount === 0) {
-            throw new Error("No user found");
-        }
+        if (data.rowCount === 0) 
+            throw new NotFoundError("No user found");
 
         return data.rows[0];
     } catch(e) {
